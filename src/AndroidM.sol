@@ -3,9 +3,11 @@ pragma solidity ^0.8.13;
 
 import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
+import {IERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol";
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 import {ReentrancyGuard} from "openzeppelin-contracts/contracts/security/ReentrancyGuard.sol";
 
+import {TokenCallbackHandler} from "./TokenCallbackHandler.sol";
 import {IBonklerAuction, AuctionData} from "./interfaces/IBonklerAuction.sol";
 
 // Author: 𝖒
@@ -16,7 +18,7 @@ error EtherTransferWasUnsuccessful();
 error CannotSettle(uint256 bonklerId);
 error SenderNotAllowed(address sender);
 
-contract AndroidM is ReentrancyGuard, Ownable {
+contract AndroidM is TokenCallbackHandler, ReentrancyGuard, Ownable {
     address public immutable BONKLER_AUCTION;
     address public immutable BONKLER;
     uint256 public immutable BID_MINIMUM;
@@ -47,6 +49,26 @@ contract AndroidM is ReentrancyGuard, Ownable {
     );
 
     event Settled(address indexed settler, uint256 bonklerId);
+
+    // Create events for ERC20, ERC721, and ERC1155 withdraws
+    event ERC20Withdrawn(
+        address indexed to,
+        address indexed token,
+        uint256 amount
+    );
+
+    event ERC721Withdrawn(
+        address indexed to,
+        address indexed token,
+        uint256 tokenId
+    );
+
+    event ERC1155Withdrawn(
+        address indexed to,
+        address indexed token,
+        uint256 tokenId,
+        uint256 amount
+    );
 
     constructor(
         address _bonklerAuction,
@@ -134,5 +156,40 @@ contract AndroidM is ReentrancyGuard, Ownable {
         }
     }
 
-    // Note: Need to add ability to withdraw any other tokens that are dropped to this AndroidM
+    // Note: Added the TokenCallbackHandler, need to ensure that this works properly (can receive NFTs)
+
+    function withdrawERC20(
+        address _tokenContract,
+        address _to,
+        uint256 _amount
+    ) external onlyOwner {
+        ERC20(_tokenContract).transfer(_to, _amount);
+
+        emit ERC20Withdrawn(_to, _tokenContract, _amount);
+    }
+
+    function withdrawERC721(
+        address _tokenContract,
+        address _to,
+        uint256 _tokenId
+    ) external onlyOwner {
+        IERC721(_tokenContract).safeTransferFrom(address(this), _to, _tokenId);
+        emit ERC721Withdrawn(_to, _tokenContract, _tokenId);
+    }
+
+    function withdrawERC1155(
+        address _tokenContract,
+        address _to,
+        uint256 _tokenId,
+        uint256 _amount
+    ) external onlyOwner {
+        IERC1155(_tokenContract).safeTransferFrom(
+            address(this),
+            _to,
+            _tokenId,
+            _amount,
+            ""
+        );
+        emit ERC1155Withdrawn(_to, _tokenContract, _tokenId, _amount);
+    }
 }
