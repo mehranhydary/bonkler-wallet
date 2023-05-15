@@ -48,7 +48,7 @@ contract TokenCallbackHandler is
         address,
         uint256[] memory,
         bytes memory
-    ) public virtual override returns (bytes4) {
+    ) public virtual returns (bytes4) {
         return this.onERC721BatchReceived.selector;
     }
 

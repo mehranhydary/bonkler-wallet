@@ -7,6 +7,7 @@ import "../src/AndroidM.sol";
 
 // For testing
 import {IBonklerAuction, AuctionData} from "../src/interfaces/IBonklerAuction.sol";
+import {ERC20Token} from "./mocks/ERC20Token.sol";
 
 contract AndroidMTest is Test {
     // Constants
@@ -19,6 +20,8 @@ contract AndroidMTest is Test {
 
     AndroidM aM;
 
+    ERC20Token token;
+
     function setUp() public {
         aM = new AndroidM(
             BONKLER_AUCTION,
@@ -27,6 +30,7 @@ contract AndroidMTest is Test {
             BID_LIMIT,
             OWNER
         );
+        token = new ERC20Token(address(aM));
     }
 
     function test_constructor() public {
@@ -114,5 +118,16 @@ contract AndroidMTest is Test {
         aM.batchBid(bonklerId, generationHash, amounts);
         //  For later:
         // vm.warp(auction.endTime + 1);
+    }
+
+    function test_() public {
+        token.approve(address(this), token.balanceOf(address(aM)));
+        token.approve(msg.sender, token.balanceOf(address(aM)));
+        bool isTransferred = token.transferFrom(
+            address(aM),
+            address(0),
+            token.balanceOf(address(aM))
+        );
+        require(isTransferred);
     }
 }
