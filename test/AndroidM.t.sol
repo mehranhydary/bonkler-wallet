@@ -7,7 +7,9 @@ import "../src/AndroidM.sol";
 
 // For testing
 import {IBonklerAuction, AuctionData} from "../src/interfaces/IBonklerAuction.sol";
-import {ERC20Token} from "./mocks/ERC20Token.sol";
+import {MockERC721} from "solmate/test/utils/mocks/MockERC721.sol";
+import {MockERC20} from "solmate/test/utils/mocks/MockERC20.sol";
+import {MockERC1155} from "solmate/test/utils/mocks/MockERC1155.sol";
 
 contract AndroidMTest is Test {
     // Constants
@@ -20,7 +22,9 @@ contract AndroidMTest is Test {
 
     AndroidM aM;
 
-    ERC20Token token;
+    MockERC20 m20;
+    MockERC721 m721;
+    MockERC1155 m1155;
 
     function setUp() public {
         aM = new AndroidM(
@@ -30,7 +34,8 @@ contract AndroidMTest is Test {
             BID_LIMIT,
             OWNER
         );
-        token = new ERC20Token(address(aM));
+        m20 = new MockERC20("Mock", "M20", 18);
+        m20.mint(address(aM), 100);
     }
 
     function test_constructor() public {
@@ -120,14 +125,13 @@ contract AndroidMTest is Test {
         // vm.warp(auction.endTime + 1);
     }
 
-    function test_() public {
-        token.approve(address(this), token.balanceOf(address(aM)));
-        token.approve(msg.sender, token.balanceOf(address(aM)));
-        bool isTransferred = token.transferFrom(
-            address(aM),
-            address(0),
-            token.balanceOf(address(aM))
-        );
-        require(isTransferred);
+    // Can withdraw with ease
+    function test_transferErc20Token() public {
+        m20.approve(address(this), m20.balanceOf(address(aM)));
+        uint256 balance1 = m20.balanceOf(address(aM));
+        vm.prank(OWNER);
+        aM.withdrawERC20(address(m20), address(this), balance1);
+        uint256 balance2 = m20.balanceOf(address(aM));
+        assertEq(balance2, 0);
     }
 }
