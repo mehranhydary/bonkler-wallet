@@ -1,18 +1,26 @@
-# <h1 align="center"> Hardhat x Foundry Template </h1>
+# Bonkler Wallet
 
-**Template repository for getting started quickly with Hardhat and Foundry in one project**
+Bonkler wallet is a simple smart contract that can make bids for you on the Bonkler NFTs.
 
-![Github Actions](https://github.com/devanonon/hardhat-foundry-template/workflows/test/badge.svg)
+## Description
+
+The Bonkler wallet can interact with the Bonkler auction contract. The idea is that as a user, you can deploy this contract and store ETH in it. Once the ETH is in it, you can call `bid` or `batchBid` to make bids on active Bonkler auctions.
+
+If your bid is the highest at the end of the auction, the NFT will be sent to this Bonkler wallet. Upon receiving the Bonkler NFT you can also withdraw the token from this wallet.
+
+Any airdrops that are give to Bonkler bidders / holders can also be sent to this contract. The contract is able to receive ERC20, ERC721, and ERC1155 tokens. The tokens it receives can be withdrawn from the contract if need be.
 
 ### Getting Started
 
- * Use Foundry: 
+-   Use Foundry:
+
 ```bash
 forge install
 forge test
 ```
 
- * Use Hardhat:
+-   Use Hardhat:
+
 ```bash
 npm install
 npx hardhat test
@@ -20,19 +28,22 @@ npx hardhat test
 
 ### Features
 
- * Write / run tests with either Hardhat or Foundry:
+-   Write / run tests with either Hardhat or Foundry:
+
 ```bash
 forge test
 # or
 npx hardhat test
 ```
 
- * Use Hardhat's task framework
+-   Use Hardhat's task framework
+
 ```bash
 npx hardhat example
 ```
 
- * Install libraries with Foundry which work with Hardhat.
+-   Install libraries with Foundry which work with Hardhat.
+
 ```bash
 forge install rari-capital/solmate # Already in this repo, just an example
 ```
