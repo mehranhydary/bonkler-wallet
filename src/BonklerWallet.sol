@@ -18,7 +18,7 @@ error EtherTransferWasUnsuccessful();
 error CannotSettle(uint256 bonklerId);
 error SenderNotAllowed(address sender);
 
-contract AndroidM is TokenCallbackHandler, ReentrancyGuard, Ownable {
+contract BonklerWallet is TokenCallbackHandler, ReentrancyGuard, Ownable {
     address public immutable BONKLER_AUCTION;
     address public immutable BONKLER;
     uint256 public immutable BID_MINIMUM;
@@ -119,7 +119,7 @@ contract AndroidM is TokenCallbackHandler, ReentrancyGuard, Ownable {
     ) internal {
         require(
             _bidAmount <= address(this).balance,
-            "AndroidM: bid amount is greater than available eth"
+            "BonklerWallet: bid amount is greater than available eth"
         );
         AuctionData memory auction = IBonklerAuction(BONKLER_AUCTION)
             .auctionData();
@@ -127,12 +127,12 @@ contract AndroidM is TokenCallbackHandler, ReentrancyGuard, Ownable {
         // Ensure that the bid you are putting in is greater than the minimum bid
         require(
             _bidAmount - auction.amount >= BID_MINIMUM,
-            "AndroidM: bid amount is less than minimum bid"
+            "BonklerWallet: bid amount is less than minimum bid"
         );
         // Ensure that the bid you are putting in is less than the bid limit
         require(
             _bidAmount <= BID_LIMIT,
-            "AndroidM: bid amount is greater than bid limit"
+            "BonklerWallet: bid amount is greater than bid limit"
         );
 
         if (auction.bonklerId != _bonklerId) {
